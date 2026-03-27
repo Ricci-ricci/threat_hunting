@@ -1,4 +1,4 @@
-with open("log_example.txt", "r", encoding="utf-8") as file:
+with open("logs/log_example.txt", "r", encoding="utf-8") as file:
     logins = file.readlines()
 
 fail_count = {}
