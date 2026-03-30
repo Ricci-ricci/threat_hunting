@@ -1,7 +1,19 @@
+from datetime import datetime
+
+
+def parse_timestamp(logs):
+    try:
+        raw = f"{logs[0]} {logs[1]} {logs[2]} {datetime.now().year}"
+        return datetime.strptime(raw, "%b %d %H:%M:%S %Y")
+    except (ValueError, IndexError):
+        return None
+
+
 def parse_linux_log(line):
     logs = line.split()
     content = {
         "date": " ".join(logs[0:3]) if len(logs) >= 3 else None,
+        "timestamp": parse_timestamp(logs),
         "service": logs[4] if len(logs) >= 5 else None,
         "event": None,
         "user": None,
@@ -34,7 +46,5 @@ def parse_file(file_path):
     for log in linux_log:
         content = parse_linux_log(log.strip())
         if content["event"]:
-            logs.append(
-                content
-            )  # fixed: was appending raw `log` string instead of parsed dict
+            logs.append(content)
     return logs
