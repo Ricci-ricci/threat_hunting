@@ -1,15 +1,29 @@
 import json
 from datetime import datetime
 
-from detector import detect_bruteforce, detect_success_after_fail
+from detector import (
+    detect_bruteforce,
+    detect_distributed_bruteforce,
+    detect_off_hours_login,
+    detect_root_login,
+    detect_success_after_fail,
+    detect_user_enumeration,
+)
+from enrichment import enrich_with_geoip
 from parser import parse_file
 
 logs = parse_file("logs/linux_log.txt")
 
-alerts_1 = detect_bruteforce(logs)
-alerts_2 = detect_success_after_fail(logs)
+all_alerts = (
+    detect_bruteforce(logs)
+    + detect_success_after_fail(logs)
+    + detect_user_enumeration(logs)
+    + detect_root_login(logs)
+    + detect_distributed_bruteforce(logs)
+    + detect_off_hours_login(logs)
+)
 
-all_alerts = alerts_1 + alerts_2
+all_alerts = enrich_with_geoip(all_alerts)
 
 print("=== Alerts ===")
 for alert in all_alerts:
